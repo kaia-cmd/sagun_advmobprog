@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Any signed-in Firebase user (chat's Users/chat_rooms collections)
+    // can read/write. Anonymous/unauthenticated requests are rejected.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

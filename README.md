@@ -245,8 +245,20 @@ without opening the tab at all.
 
 ### Notes
 
-- Firestore rules are left wide open (`allow read, write: if true`) per the
-  lab instructions, which is fine for this assignment but would need to
-  scope reads/writes to `request.auth.uid` before shipping for real.
+- Firestore rules started as the lab-instructed `allow read, write: if true`
+  (needed to get the Rules tab published at all), then were tightened to
+  `allow read, write: if request.auth != null` (see `firestore.rules`,
+  deployed with `firebase deploy --only firestore:rules`) once the repo went
+  public on GitHub — an open-to-everyone rule plus a public project ID is a
+  real way for strangers to read/write the database, not just a theoretical
+  risk. Requiring sign-in doesn't break anything here since only signed-in
+  Firebase users ever touch Firestore (chat).
+- `lib/firebase_options.dart` (and `android/app/google-services.json`)
+  contain Firebase's client `apiKey` values and are committed on purpose —
+  Firebase treats these as app identifiers, not secrets; the security
+  boundary is the rules above, not hiding this file. GitHub's secret
+  scanner still flags them as "Google API Key" on its generic pattern
+  match, which is why the rules fix above (not deleting/rotating the key)
+  is the actual remediation; the alert can be dismissed afterward.
 - `assets/.env` is git-ignored; see `assets/.env.example` for the keys the
   app expects (`HOST`, `API_KEY`) and copy it to `assets/.env` locally.
